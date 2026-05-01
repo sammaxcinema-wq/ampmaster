@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sunhand Auto Car — Quotation | Invoice | Receipt</title>
+    <title>Sunhands Auto Care — Quotation | Invoice | Receipt</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -87,10 +87,10 @@
 <header class="app-header">
     <div class="logo-row">
         <div class="logo-icon">
-            <img src="https://i.ibb.co/0RQfKqkW/1777590981480.png" alt="Sunhand Auto Car">
+            <img src="https://i.ibb.co/0RQfKqkW/1777590981480.png" alt="Sunhands Auto Care">
         </div>
         <div class="logo-text">
-            <div class="brand">SUNHAND AUTO CAR</div>
+            <div class="brand">SUNHANDS AUTO CARE</div>
             <div class="tagline">Professional Auto Services</div>
         </div>
         <div class="doc-number" id="docNumber">INV-0001</div>
@@ -180,7 +180,7 @@
         etrSerial: 'ETR-2024-001245',
         fiscalisedId: '000000101183035667',
         controlCode: '12345ABCDE',
-        notes: 'Thank you for choosing Sunhand Auto Care.',
+        notes: 'Thank you for choosing Sunhands Auto Care.',
         terms: 'Payment due on receipt. Warranty: 3 months on genuine parts & labor.',
         bankAccount: '01700003034',
         mpesaPaybill: '099903642',
@@ -244,7 +244,7 @@
     function setPayment(s){paymentStatus=s;document.querySelectorAll('.status-pill').forEach(p=>p.className='status-pill');const pill=document.getElementById('pill_'+s);if(pill)pill.classList.add('active-'+s);}
     function updateField(k,v){formData[k]=v;if(k==='invoiceNo')document.getElementById('docNumber').textContent=v;}
 
-    // ─── PDF TEMPLATES ────────────────────────────────────────────────────────
+    // ─── PDF TEMPLATES (Brand updated to SUNHANDS AUTO CARE) ────────────────
     function renderPDFTemplate(){
         const {sub,disc,tax,grand}=calcTotals();
         const tab=currentTab;
@@ -258,7 +258,7 @@
             html=`<div style="width:794px;min-height:1123px;background:#fff;padding:48px;font-family:'Inter','DM Sans',sans-serif;color:#1f2937;position:relative;overflow:hidden;">
                 <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0.025;pointer-events:none;transform:rotate(-45deg);"><h1 style="font-size:220px;font-weight:900;">PAID</h1></div>
                 <div style="background:#1a1a1a;margin:-48px -48px 40px;padding:32px 48px;display:flex;justify-content:space-between;align-items:center;border-bottom:4px solid #22c55e;">
-                    <div style="display:flex;align-items:center;gap:12px;">${logoImg}<div><div style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:18px;color:#fff;">SUNHAND AUTO CAR</div><div style="font-size:8px;color:#d4a843;">Professional Auto Services</div></div></div>
+                    <div style="display:flex;align-items:center;gap:12px;">${logoImg}<div><div style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:18px;color:#fff;">SUNHANDS AUTO CARE</div><div style="font-size:8px;color:#d4a843;">Professional Auto Services</div></div></div>
                     <div style="color:#fff;text-align:right;"><h2 style="font-size:22px;font-weight:900;">OFFICIAL RECEIPT</h2><p style="color:#22c55e;font-weight:700;">Payment Confirmed</p></div>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:32px;">
@@ -267,30 +267,30 @@
                 </div>
                 <table style="width:100%;border-collapse:collapse;margin-bottom:28px;"><thead><tr style="background:#f9fafb;border-top:2px solid #000;border-bottom:2px solid #000;"><th>Description</th><th style="text-align:right;">Amount (KSH)</th></tr></thead><tbody><tr><td style="padding:20px;">FULL SETTLEMENT FOR INVOICE #${formData.invoiceNo}</td><td style="padding:20px;text-align:right;font-weight:900;font-size:20px;">${fmtPlain(grand)}</td></tr></tbody></table>
                 <div style="display:grid;grid-template-columns:3fr 2fr;gap:24px;"><div style="border:2px dashed #d1d5db;padding:14px;display:flex;gap:14px;"><img src="${qrURL}" style="width:80px;"><div><h4>KRA eTIMS DATA</h4><p style="font-size:9px;">Fiscalised ID: ${formData.fiscalisedId}<br>Control Code: ${formData.controlCode}<br>Tax: ${taxPct}% VAT (${fmtPlain(tax)})</p></div></div><div style="background:#22c55e;color:#fff;padding:20px;border-radius:8px;text-align:right;"><p style="font-size:10px;">TOTAL PAID</p><p style="font-size:26px;font-weight:900;">KSH ${fmtPlain(grand)}</p><p style="font-size:9px;">BALANCE: 0.00</p></div></div>
-                <div style="margin-top:40px;text-align:center;border-top:1px solid #e5e7eb;padding-top:20px;"><p style="font-weight:700;">THANK YOU FOR YOUR BUSINESS!</p></div>
+                <div style="margin-top:40px;text-align:center;border-top:1px solid #e5e7eb;padding-top:20px;"><p style="font-weight:700;">THANK YOU FOR CHOOSING SUNHANDS AUTO CARE!</p></div>
             </div>`;
         }else if(tab==='QUOTATION'){
             const validUntil=new Date(new Date(formData.date||Date.now()).getTime()+14*86400000).toISOString().slice(0,10);
             const itemsRows=lineItems.map(item=>`<tr><td style="padding:12px;">${item.description||'—'}<br><span style="font-size:9px;">Code: ${item.code||'—'}</span></td><td style="text-align:center;">${item.qty}</td><td style="text-align:right;">${fmtPlain(item.price)}</td><td style="text-align:right;font-weight:700;">${fmtPlain(item.qty*item.price)}</td></tr>`).join('');
             html=`<div style="width:794px;min-height:1123px;background:#fff;padding:48px;font-family:'Inter','DM Sans',sans-serif;color:#1f2937;">
                 <div style="background:#1a1a1a;margin:-48px -48px 40px;padding:32px 48px;display:flex;justify-content:space-between;align-items:center;border-bottom:4px solid #f97316;">
-                    <div style="display:flex;align-items:center;gap:12px;">${logoImg}<div><div style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:18px;color:#fff;">SUNHAND AUTO CAR</div><div style="font-size:8px;color:#d4a843;">Professional Auto Services</div></div></div>
+                    <div style="display:flex;align-items:center;gap:12px;">${logoImg}<div><div style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:18px;color:#fff;">SUNHANDS AUTO CARE</div><div style="font-size:8px;color:#d4a843;">Professional Auto Services</div></div></div>
                     <div style="color:#fff;text-align:right;"><h2 style="font-size:22px;font-weight:900;">OFFICIAL QUOTATION</h2><p style="color:#f97316;">#${formData.invoiceNo}</p></div>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:32px;"><div><h3 style="font-weight:900;color:#ea580c;">QUOTE TO:</h3><p style="font-size:20px;font-weight:700;">${formData.custName}</p><p>Vehicle: ${formData.make} ${formData.model} (${formData.vehicleReg})</p></div><div style="text-align:right;"><p>Date: ${formData.date}</p><p>Valid Until: ${validUntil}</p></div></div>
                 <table style="width:100%;border-collapse:collapse;"><thead><tr style="background:#f9fafb;border-top:2px solid #000;"><th>Service/Part</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead><tbody>${itemsRows}</tbody></table>
                 <div style="display:flex;justify-content:flex-end;margin-top:20px;"><div style="width:300px;"><div style="display:flex;justify-content:space-between;padding:8px 0;">Subtotal<span>${fmtPlain(sub)}</span></div><div style="display:flex;justify-content:space-between;padding:8px 0;">VAT (${taxPct}%)<span>${fmtPlain(tax)}</span></div><div style="background:#111827;color:#fff;padding:14px;border-radius:6px;display:flex;justify-content:space-between;font-weight:900;">GRAND TOTAL<span>KSH ${fmtPlain(grand)}</span></div></div></div>
-                <div style="margin-top:48px;display:grid;grid-template-columns:1fr 1fr;"><div style="font-size:10px;"><h4>TERMS:</h4><p>1. Valid 14 days.</p></div><div style="text-align:center;"><div style="border-bottom:1px solid #000;width:180px;margin:0 auto 6px;"></div><p style="font-size:10px;font-weight:700;">Authorized Signature</p></div></div>
+                <div style="margin-top:48px;display:grid;grid-template-columns:1fr 1fr;"><div style="font-size:10px;"><h4>TERMS:</h4><p>1. Valid 14 days. 2. Contact Sunhands Auto Care for approval.</p></div><div style="text-align:center;"><div style="border-bottom:1px solid #000;width:180px;margin:0 auto 6px;"></div><p style="font-size:10px;font-weight:700;">Authorized Signature</p></div></div>
             </div>`;
         }else{
             const itemsRows=lineItems.map(item=>`<tr><td style="padding:12px;">${item.code||'—'}</td><td style="padding:12px;font-weight:700;">${item.description||'—'}</td><td style="text-align:center;">${item.qty}</td><td style="text-align:right;">${fmtPlain(item.price)}</td><td style="text-align:right;font-weight:700;">${fmtPlain(item.qty*item.price)}</td></tr>`).join('');
             html=`<div style="width:794px;min-height:1123px;background:#fff;padding:48px;font-family:'Inter','DM Sans',sans-serif;color:#1f2937;">
-                <div style="background:#000;margin:-48px -48px 32px;padding:28px 48px;text-align:center;">${logoImg}</div>
+                <div style="background:#000;margin:-48px -48px 32px;padding:28px 48px;text-align:center;">${logoImg}<div style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:22px;color:#fff;margin-top:8px;">SUNHANDS AUTO CARE</div><div style="color:#d4a843;font-size:10px;">Professional Auto Services</div></div>
                 <div style="text-align:center;margin-bottom:28px;"><h1 style="font-size:26px;font-weight:900;border-bottom:2px solid #000;display:inline-block;padding-bottom:4px;">OFFICIAL INVOICE</h1></div>
                 <div style="display:flex;justify-content:space-between;margin-bottom:32px;"><div><h3 style="font-weight:700;">BILL TO:</h3><p style="font-size:18px;font-weight:700;">${formData.custName} (${formData.vehicleReg})</p><p>${formData.custAddress}</p><p>PIN: ${formData.kraPin}</p></div><div style="text-align:right;"><p>Invoice No: ${formData.invoiceNo}</p><p>Date: ${formData.date}</p><p style="color:#ef4444;">Due: ${formData.dueDate}</p></div></div>
                 <table style="width:100%;border-collapse:collapse;"><thead><tr style="border-top:2px solid #000;border-bottom:2px solid #000;"><th>Item Code</th><th>Description</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead><tbody>${itemsRows}</tbody></table>
                 <div style="display:flex;justify-content:space-between;margin-top:24px;border-top:2px solid #000;padding-top:16px;"><div style="display:flex;gap:12px;border:1px solid #e5e7eb;padding:12px;background:#f9fafb;"><img src="${qrURL}" style="width:70px;"><div><h4 style="font-size:9px;">KRA Compliance</h4><p style="font-size:8px;">Fiscalised ID: ${formData.fiscalisedId}<br>Control Code: ${formData.controlCode}</p></div></div><div style="text-align:right;"><div style="display:flex;justify-content:space-between;">Subtotal<span>KSH ${fmtPlain(sub)}</span></div><div style="display:flex;justify-content:space-between;">VAT (${taxPct}%)<span>KSH ${fmtPlain(tax)}</span></div><div style="display:flex;justify-content:space-between;border-top:2px solid #000;margin-top:6px;padding-top:8px;font-weight:900;">GRAND TOTAL<span>KSH ${fmtPlain(grand)}</span></div></div></div>
-                <div style="margin-top:32px;font-size:10px;display:grid;grid-template-columns:1fr 1fr;"><div><p>Payment: Bank ${formData.bankAccount} | M-Pesa ${formData.mpesaPaybill}</p></div><div style="text-align:right;font-style:italic;">Thank you for choosing Sunhand Auto Care.</div></div>
+                <div style="margin-top:32px;font-size:10px;display:grid;grid-template-columns:1fr 1fr;"><div><p>Payment: Bank ${formData.bankAccount} | M-Pesa ${formData.mpesaPaybill}</p></div><div style="text-align:right;font-style:italic;">Thank you for choosing Sunhands Auto Care.</div></div>
             </div>`;
         }
         document.getElementById('pdfTemplate').innerHTML=html;
@@ -322,14 +322,14 @@
             pdf.addImage(imgData,'PNG',0,0,pdfWidth,Math.min(pdfHeight,297));
             if(pdfHeight>297){let rem=pdfHeight-297;while(rem>0){pdf.addPage();pdf.addImage(imgData,'PNG',0,-(297*(pdf.getNumberOfPages()-1)),pdfWidth,pdfHeight);rem-=297;}}
             const pdfBlob=pdf.output('blob');
-            const pdfName=`Sunhand_${currentTab}_${formData.invoiceNo.replace(/[/#]/g,'_')}.pdf`;
+            const pdfName=`Sunhands_${currentTab}_${formData.invoiceNo.replace(/[/#]/g,'_')}.pdf`;
             if(navigator.canShare&&navigator.canShare({files:[new File([pdfBlob],pdfName,{type:'application/pdf'})]})){
-                await navigator.share({title:`Sunhand Auto Car — ${formData.invoiceNo}`,text:`*SUNHAND AUTO CAR*\n📄 ${currentTab}: ${formData.invoiceNo}\n👤 ${formData.custName}\n🚗 ${formData.vehicleReg}\n💰 Grand Total: ${fmt(calcTotals().grand)}\n📅 ${formData.date}`,files:[new File([pdfBlob],pdfName,{type:'application/pdf'})]});
+                await navigator.share({title:`Sunhands Auto Care — ${formData.invoiceNo}`,text:`*SUNHANDS AUTO CARE*\n📄 ${currentTab}: ${formData.invoiceNo}\n👤 ${formData.custName}\n🚗 ${formData.vehicleReg}\n💰 Grand Total: ${fmt(calcTotals().grand)}\n📅 ${formData.date}`,files:[new File([pdfBlob],pdfName,{type:'application/pdf'})]});
                 showToast('✅ PDF shared!',3000);
             }else{
                 const url=URL.createObjectURL(pdfBlob);const a=document.createElement('a');a.href=url;a.download=pdfName;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
                 showToast('📥 PDF downloaded! Share manually via WhatsApp.',4000);
-                const {grand}=calcTotals();const msg=encodeURIComponent(`*SUNHAND AUTO CAR*\n📄 ${currentTab}: ${formData.invoiceNo}\n👤 ${formData.custName}\n🚗 ${formData.vehicleReg}\n💰 Grand Total: ${fmt(grand)}\n📅 ${formData.date}`);
+                const {grand}=calcTotals();const msg=encodeURIComponent(`*SUNHANDS AUTO CARE*\n📄 ${currentTab}: ${formData.invoiceNo}\n👤 ${formData.custName}\n🚗 ${formData.vehicleReg}\n💰 Grand Total: ${fmt(grand)}\n📅 ${formData.date}`);
                 setTimeout(()=>{window.open('https://wa.me/?text='+msg,'_blank');},900);
             }
         }catch(err){console.error(err);showToast('⚠️ Could not generate PDF. Try again.',3500);}
@@ -350,7 +350,7 @@
                 height:templateEl.scrollHeight
             });
             const {jsPDF}=window.jspdf;const imgData=canvas.toDataURL('image/png');const pdfWidth=210;const pdfHeight=(canvas.height*pdfWidth)/canvas.width;const pdf=new jsPDF('p','mm','a4');pdf.addImage(imgData,'PNG',0,0,pdfWidth,Math.min(pdfHeight,297));if(pdfHeight>297){let rem=pdfHeight-297;while(rem>0){pdf.addPage();pdf.addImage(imgData,'PNG',0,-(297*(pdf.getNumberOfPages()-1)),pdfWidth,pdfHeight);rem-=297;}}
-            pdf.save(`Sunhand_${currentTab}_${formData.invoiceNo.replace(/[/#]/g,'_')}.pdf`);showToast('✅ PDF downloaded!',2500);
+            pdf.save(`Sunhands_${currentTab}_${formData.invoiceNo.replace(/[/#]/g,'_')}.pdf`);showToast('✅ PDF downloaded!',2500);
         }catch(err){console.error(err);showToast('⚠️ Download failed.',3000);}
         finally{loadingEl.classList.add('hidden');document.getElementById('pdfTemplate').innerHTML='';}
     }
@@ -359,7 +359,7 @@
         generateAndSharePDF();
     }
 
-    // ─── RENDER MAIN UI ───────────────────────────────────────────────────────
+    // ─── RENDER MAIN UI (Notes updated with new brand) ───────────────────────
     function render(){
         const {sub,disc,tax,grand}=calcTotals();
         document.getElementById('mainContent').innerHTML=`

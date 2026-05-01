@@ -87,7 +87,6 @@
 <header class="app-header">
     <div class="logo-row">
         <div class="logo-icon">
-            <!-- Official logo exactly as provided -->
             <img src="https://i.ibb.co/0RQfKqkW/1777590981480.png" alt="Sunhand Auto Car">
         </div>
         <div class="logo-text">
@@ -111,10 +110,8 @@
 
 <div class="content" id="mainContent"></div>
 
-<!-- Hidden PDF template (captured by html2canvas) -->
 <div id="pdfTemplate" style="position:absolute;left:-9999px;top:0;width:794px;pointer-events:none;"></div>
 
-<!-- Floating button – directly shares the current document PDF to WhatsApp -->
 <div class="float-chat">
     <button class="float-share-btn" onclick="handleFloatingShare()" aria-label="Share PDF to WhatsApp">
         <span class="pulse-ring"></span>
@@ -125,7 +122,7 @@
 </div>
 
 <script>
-    // ─── LAZY-LOAD PDF LIBRARIES (only when user clicks share/download) ─────────
+    // ─── LAZY-LOAD PDF LIBRARIES (loaded on demand) ─────────
     let pdfLibsLoaded = false;
     function loadPdfLibs() {
         return new Promise((resolve, reject) => {
@@ -192,9 +189,9 @@
 
     const prefixes = { QUOTATION:'Q-2026-', INVOICE:'S-', RECEIPT:'R-' };
     const docNumSuffix = { QUOTATION:'0048', INVOICE:'00124', RECEIPT:'00124' };
-    const logoURL = 'https://i.ibb.co/0RQfKqkW/1777590981480.png'; // shared logo URL
+    const logoURL = 'https://i.ibb.co/0RQfKqkW/1777590981480.png'; // external logo
 
-    // ─── HELPER FUNCTIONS ─────────────────────────────────────────────────────
+    // ─── HELPERS ─────────────────────────────────────────────────────────────
     function fmt(n){ return 'KSH '+Number(n).toLocaleString('en-KE',{minimumFractionDigits:2,maximumFractionDigits:2});}
     function fmtPlain(n){ return Number(n).toLocaleString('en-KE',{minimumFractionDigits:2,maximumFractionDigits:2});}
     function calcTotals(){
@@ -247,7 +244,7 @@
     function setPayment(s){paymentStatus=s;document.querySelectorAll('.status-pill').forEach(p=>p.className='status-pill');const pill=document.getElementById('pill_'+s);if(pill)pill.classList.add('active-'+s);}
     function updateField(k,v){formData[k]=v;if(k==='invoiceNo')document.getElementById('docNumber').textContent=v;}
 
-    // ─── PROFESSIONAL PDF TEMPLATES (exactly matching your document mockups) ──
+    // ─── PDF TEMPLATES ────────────────────────────────────────────────────────
     function renderPDFTemplate(){
         const {sub,disc,tax,grand}=calcTotals();
         const tab=currentTab;
@@ -299,7 +296,7 @@
         document.getElementById('pdfTemplate').innerHTML=html;
     }
 
-    // ─── SHARE / DOWNLOAD (lazy-loads libraries if needed) ────────────────────
+    // ─── SHARE / DOWNLOAD (lazy-loads libraries) ────────────────────
     async function generateAndSharePDF(){
         const loadingEl=document.getElementById('loadingOverlay');
         loadingEl.classList.remove('hidden');
@@ -309,7 +306,14 @@
             renderPDFTemplate();
             const templateEl=document.getElementById('pdfTemplate');
             await new Promise(r=>setTimeout(r,400));
-            const canvas=await html2canvas(templateEl,{scale:2,useCORS:true,allowTaint:true,backgroundColor:'#ffffff',logging:false,width:templateEl.scrollWidth,height:templateEl.scrollHeight});
+            const canvas=await html2canvas(templateEl,{
+                scale:2,
+                useCORS:true,
+                backgroundColor:'#ffffff',
+                logging:false,
+                width:templateEl.scrollWidth,
+                height:templateEl.scrollHeight
+            });
             const {jsPDF}=window.jspdf;
             const imgData=canvas.toDataURL('image/png');
             const pdfWidth=210;
@@ -318,7 +322,7 @@
             pdf.addImage(imgData,'PNG',0,0,pdfWidth,Math.min(pdfHeight,297));
             if(pdfHeight>297){let rem=pdfHeight-297;while(rem>0){pdf.addPage();pdf.addImage(imgData,'PNG',0,-(297*(pdf.getNumberOfPages()-1)),pdfWidth,pdfHeight);rem-=297;}}
             const pdfBlob=pdf.output('blob');
-            const pdfName=`Sunhand_${currentTab}_${formData.invoiceNo.replace(/[\/#]/g,'_')}.pdf`;
+            const pdfName=`Sunhand_${currentTab}_${formData.invoiceNo.replace(/[/#]/g,'_')}.pdf`;
             if(navigator.canShare&&navigator.canShare({files:[new File([pdfBlob],pdfName,{type:'application/pdf'})]})){
                 await navigator.share({title:`Sunhand Auto Car — ${formData.invoiceNo}`,text:`*SUNHAND AUTO CAR*\n📄 ${currentTab}: ${formData.invoiceNo}\n👤 ${formData.custName}\n🚗 ${formData.vehicleReg}\n💰 Grand Total: ${fmt(calcTotals().grand)}\n📅 ${formData.date}`,files:[new File([pdfBlob],pdfName,{type:'application/pdf'})]});
                 showToast('✅ PDF shared!',3000);
@@ -337,14 +341,20 @@
         try{
             await loadPdfLibs();
             renderPDFTemplate();const templateEl=document.getElementById('pdfTemplate');await new Promise(r=>setTimeout(r,400));
-            const canvas=await html2canvas(templateEl,{scale:2,useCORS:true,allowTaint:true,backgroundColor:'#ffffff',logging:false,width:templateEl.scrollWidth,height:templateEl.scrollHeight});
+            const canvas=await html2canvas(templateEl,{
+                scale:2,
+                useCORS:true,
+                backgroundColor:'#ffffff',
+                logging:false,
+                width:templateEl.scrollWidth,
+                height:templateEl.scrollHeight
+            });
             const {jsPDF}=window.jspdf;const imgData=canvas.toDataURL('image/png');const pdfWidth=210;const pdfHeight=(canvas.height*pdfWidth)/canvas.width;const pdf=new jsPDF('p','mm','a4');pdf.addImage(imgData,'PNG',0,0,pdfWidth,Math.min(pdfHeight,297));if(pdfHeight>297){let rem=pdfHeight-297;while(rem>0){pdf.addPage();pdf.addImage(imgData,'PNG',0,-(297*(pdf.getNumberOfPages()-1)),pdfWidth,pdfHeight);rem-=297;}}
-            pdf.save(`Sunhand_${currentTab}_${formData.invoiceNo.replace(/[\/#]/g,'_')}.pdf`);showToast('✅ PDF downloaded!',2500);
+            pdf.save(`Sunhand_${currentTab}_${formData.invoiceNo.replace(/[/#]/g,'_')}.pdf`);showToast('✅ PDF downloaded!',2500);
         }catch(err){console.error(err);showToast('⚠️ Download failed.',3000);}
         finally{loadingEl.classList.add('hidden');document.getElementById('pdfTemplate').innerHTML='';}
     }
 
-    // Floating button handler – directly shares PDF
     function handleFloatingShare(){
         generateAndSharePDF();
     }
@@ -399,7 +409,6 @@
         </div></div>`;
     }
 
-    // Sync payment method/ref from UI (if receipt tab is active)
     setInterval(()=>{if(window._pm)paymentMethod=window._pm;if(window._pr)paymentRef=window._pr;},500);
     window.handleFloatingShare=handleFloatingShare;
     window.switchTab=switchTab; window.addItem=addItem; window.removeItem=removeItem; window.updateItem=updateItem; window.updateDiscount=updateDiscount; window.updateTax=updateTax; window.setPayment=setPayment; window.updateField=updateField; window.generateAndSharePDF=generateAndSharePDF; window.downloadPDF=downloadPDF;

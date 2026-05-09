@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        /* Critical CSS for instant render */
+        /* Critical CSS for instant render – unchanged */
         :root{--green:#22c55e;--green-dark:#16a34a;--bg:#f0f2f5;--card:#fff;--border:#e2e8f0;--text:#1e293b;--muted:#64748b;--header-bg:#111827;--gold:#d4a843}
         *{box-sizing:border-box;margin:0;padding:0}
         body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:100px}
@@ -122,7 +122,7 @@
 </div>
 
 <script>
-    // ─── LAZY-LOAD PDF LIBRARIES (loaded on demand) ─────────
+    // ─── LAZY-LOAD PDF LIBRARIES (unchanged) ─────────
     let pdfLibsLoaded = false;
     function loadPdfLibs() {
         return new Promise((resolve, reject) => {
@@ -148,7 +148,7 @@
         });
     }
 
-    // ─── APPLICATION STATE ─────────────────────────────────────────────────────
+    // ─── APPLICATION STATE (unchanged) ────────────────────────
     let currentTab = 'INVOICE';
     let paymentStatus = 'unpaid';
     let paymentMethod = 'MPESA';
@@ -189,9 +189,9 @@
 
     const prefixes = { QUOTATION:'Q-2026-', INVOICE:'S-', RECEIPT:'R-' };
     const docNumSuffix = { QUOTATION:'0048', INVOICE:'00124', RECEIPT:'00124' };
-    const logoURL = 'https://i.ibb.co/0RQfKqkW/1777590981480.png'; // external logo
+    const logoURL = 'https://i.ibb.co/0RQfKqkW/1777590981480.png';
 
-    // ─── HELPERS ─────────────────────────────────────────────────────────────
+    // ─── HELPERS (unchanged) ──────────────────────────────────
     function fmt(n){ return 'KSH '+Number(n).toLocaleString('en-KE',{minimumFractionDigits:2,maximumFractionDigits:2});}
     function fmtPlain(n){ return Number(n).toLocaleString('en-KE',{minimumFractionDigits:2,maximumFractionDigits:2});}
     function calcTotals(){
@@ -244,7 +244,7 @@
     function setPayment(s){paymentStatus=s;document.querySelectorAll('.status-pill').forEach(p=>p.className='status-pill');const pill=document.getElementById('pill_'+s);if(pill)pill.classList.add('active-'+s);}
     function updateField(k,v){formData[k]=v;if(k==='invoiceNo')document.getElementById('docNumber').textContent=v;}
 
-    // ─── PDF TEMPLATES (Brand updated to SUNHANDS AUTO CARE) ────────────────
+    // ─── PDF TEMPLATES (unchanged) ────────────────────────────
     function renderPDFTemplate(){
         const {sub,disc,tax,grand}=calcTotals();
         const tab=currentTab;
@@ -296,7 +296,7 @@
         document.getElementById('pdfTemplate').innerHTML=html;
     }
 
-    // ─── SHARE / DOWNLOAD (lazy-loads libraries) ────────────────────
+    // ─── FIXED WHATSAPP SHARING (this part only) ────────────
     async function generateAndSharePDF(){
         const loadingEl=document.getElementById('loadingOverlay');
         loadingEl.classList.remove('hidden');
@@ -323,17 +323,42 @@
             if(pdfHeight>297){let rem=pdfHeight-297;while(rem>0){pdf.addPage();pdf.addImage(imgData,'PNG',0,-(297*(pdf.getNumberOfPages()-1)),pdfWidth,pdfHeight);rem-=297;}}
             const pdfBlob=pdf.output('blob');
             const pdfName=`Sunhands_${currentTab}_${formData.invoiceNo.replace(/[/#]/g,'_')}.pdf`;
-            if(navigator.canShare&&navigator.canShare({files:[new File([pdfBlob],pdfName,{type:'application/pdf'})]})){
-                await navigator.share({title:`Sunhands Auto Care — ${formData.invoiceNo}`,text:`*SUNHANDS AUTO CARE*\n📄 ${currentTab}: ${formData.invoiceNo}\n👤 ${formData.custName}\n🚗 ${formData.vehicleReg}\n💰 Grand Total: ${fmt(calcTotals().grand)}\n📅 ${formData.date}`,files:[new File([pdfBlob],pdfName,{type:'application/pdf'})]});
+            const file=new File([pdfBlob],pdfName,{type:'application/pdf'});
+            const {grand}=calcTotals();
+            const shareText=`*SUNHANDS AUTO CARE*\n📄 ${currentTab}: ${formData.invoiceNo}\n👤 ${formData.custName}\n🚗 ${formData.vehicleReg}\n💰 Grand Total: ${fmt(grand)}\n📅 ${formData.date}`;
+
+            // Improved sharing flow – try direct share with file first
+            try {
+                await navigator.share({
+                    title: `Sunhands Auto Care — ${formData.invoiceNo}`,
+                    text: shareText,
+                    files: [file]
+                });
                 showToast('✅ PDF shared!',3000);
-            }else{
-                const url=URL.createObjectURL(pdfBlob);const a=document.createElement('a');a.href=url;a.download=pdfName;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
-                showToast('📥 PDF downloaded! Share manually via WhatsApp.',4000);
-                const {grand}=calcTotals();const msg=encodeURIComponent(`*SUNHANDS AUTO CARE*\n📄 ${currentTab}: ${formData.invoiceNo}\n👤 ${formData.custName}\n🚗 ${formData.vehicleReg}\n💰 Grand Total: ${fmt(grand)}\n📅 ${formData.date}`);
-                setTimeout(()=>{window.open('https://wa.me/?text='+msg,'_blank');},900);
+            } catch (shareError) {
+                // If direct share fails, download and open WhatsApp with text
+                console.log('Native share failed, falling back to download + WhatsApp text', shareError);
+                const url=URL.createObjectURL(pdfBlob);
+                const a=document.createElement('a');
+                a.href=url;
+                a.download=pdfName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('📥 PDF downloaded! Opening WhatsApp…',4000);
+                setTimeout(()=>{
+                    window.open('https://wa.me/?text='+encodeURIComponent(shareText),'_blank');
+                },900);
             }
-        }catch(err){console.error(err);showToast('⚠️ Could not generate PDF. Try again.',3500);}
-        finally{loadingEl.classList.add('hidden');document.getElementById('pdfTemplate').innerHTML='';}
+        }catch(err){
+            console.error(err);
+            showToast('⚠️ Could not generate PDF. Try again.',3500);
+        }
+        finally{
+            loadingEl.classList.add('hidden');
+            document.getElementById('pdfTemplate').innerHTML='';
+        }
     }
 
     async function downloadPDF(){
@@ -359,7 +384,7 @@
         generateAndSharePDF();
     }
 
-    // ─── RENDER MAIN UI (Notes updated with new brand) ───────────────────────
+    // ─── RENDER MAIN UI (unchanged) ──────────────────────────
     function render(){
         const {sub,disc,tax,grand}=calcTotals();
         document.getElementById('mainContent').innerHTML=`

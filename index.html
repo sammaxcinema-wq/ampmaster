@@ -4,6 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sunhands Auto Care — Quotation | Invoice | Receipt</title>
+
+    <!-- ===================== PWA: Manifest (generated inline) ===================== -->
+    <script>
+        (function() {
+            const manifest = {
+                "name": "Sunhands Auto Care",
+                "short_name": "Sunhands",
+                "description": "Quotations, Invoices & Receipts for Auto Services",
+                "start_url": window.location.href.split('?')[0],
+                "display": "standalone",
+                "background_color": "#f0f2f5",
+                "theme_color": "#111827",
+                "orientation": "portrait",
+                "icons": [
+                    {
+                        "src": "https://i.ibb.co/0RQfKqkW/1777590981480.png",
+                        "sizes": "192x192",
+                        "type": "image/png",
+                        "purpose": "any"
+                    },
+                    {
+                        "src": "https://i.ibb.co/0RQfKqkW/1777590981480.png",
+                        "sizes": "512x512",
+                        "type": "image/png",
+                        "purpose": "maskable"
+                    }
+                ]
+            };
+            const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('link');
+            link.rel = 'manifest';
+            link.href = url;
+            document.head.appendChild(link);
+        })();
+    </script>
+
+    <!-- Apple meta tags for iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -80,6 +121,30 @@
         @keyframes spin{to{transform:rotate(360deg)}}
         .loading-overlay .text{color:#fff;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:2px;font-size:13px}
         .hidden{display:none!important}
+
+        /* PWA Install Button – added style */
+        #installBtn {
+            position: fixed;
+            bottom: 80px;
+            right: 14px;
+            z-index: 1000;
+            background: #111827;
+            color: #22c55e;
+            border: 2px solid #22c55e;
+            border-radius: 40px;
+            padding: 10px 16px;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 1.5px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.3);
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.2s;
+        }
+        #installBtn:hover { transform: scale(1.05); }
     </style>
 </head>
 <body>
@@ -121,8 +186,119 @@
     </button>
 </div>
 
+<!-- ==================== PWA: Install Button ==================== -->
+<button id="installBtn">📲 INSTALL APP</button>
+
 <script>
-    // ─── LAZY-LOAD PDF LIBRARIES (unchanged) ─────────
+    // ================================================================
+    // PWA: Service Worker registration (generated from a Blob URL)
+    // ================================================================
+    (function registerServiceWorker() {
+        const swCode = `
+            const CACHE_NAME = 'sunhands-v1';
+            const ASSETS = [
+                '/',
+                '/manifest.json',
+                'https://i.ibb.co/0RQfKqkW/1777590981480.png',
+                'https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap',
+                'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
+                'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
+            ];
+            self.addEventListener('install', event => {
+                event.waitUntil(
+                    caches.open(CACHE_NAME)
+                        .then(cache => cache.addAll(ASSETS))
+                        .then(() => self.skipWaiting())
+                );
+            });
+            self.addEventListener('activate', event => {
+                event.waitUntil(
+                    caches.keys().then(keys => {
+                        return Promise.all(
+                            keys.filter(key => key !== CACHE_NAME)
+                                .map(key => caches.delete(key))
+                        );
+                    }).then(() => self.clients.claim())
+                );
+            });
+            self.addEventListener('fetch', event => {
+                event.respondWith(
+                    caches.match(event.request)
+                        .then(cached => cached || fetch(event.request))
+                );
+            });
+        `;
+
+        try {
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            // Note: registering a service worker from a blob URL may not work in all browsers.
+            // As a fallback, we'll also try to register a real sw.js if it exists.
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    // First try to register from the blob URL
+                    navigator.serviceWorker.register(swUrl)
+                        .then(reg => console.log('SW (blob) registered:', reg))
+                        .catch(() => {
+                            // Fallback: try to register from a conventional sw.js file
+                            navigator.serviceWorker.register('/sw.js')
+                                .then(reg => console.log('SW (fallback) registered:', reg))
+                                .catch(err => console.warn('SW registration failed:', err));
+                        });
+                });
+            }
+        } catch (e) {
+            console.warn('SW blob registration not supported, falling back to external sw.js');
+            // Fallback to standard registration
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js')
+                        .catch(err => console.warn('SW registration failed:', err));
+                });
+            }
+        }
+    })();
+
+    // ================================================================
+    // PWA: Install Button logic
+    // ================================================================
+    (function installButton() {
+        let deferredPrompt = null;
+        const installBtn = document.getElementById('installBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'flex';
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const result = await deferredPrompt.userChoice;
+                console.log('User choice:', result.outcome);
+                deferredPrompt = null;
+                installBtn.style.display = 'none';
+            } else {
+                alert('To install, open this page in your browser and use the "Add to Home Screen" option.');
+            }
+        });
+
+        window.addEventListener('appinstalled', () => {
+            installBtn.style.display = 'none';
+            console.log('App installed successfully.');
+        });
+
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            installBtn.style.display = 'none';
+        }
+    })();
+
+    // ================================================================
+    // ORIGINAL APPLICATION – untouched (with all functions)
+    // ================================================================
+
+    // ─── LAZY-LOAD PDF LIBRARIES ─────────
     let pdfLibsLoaded = false;
     function loadPdfLibs() {
         return new Promise((resolve, reject) => {
@@ -148,7 +324,7 @@
         });
     }
 
-    // ─── APPLICATION STATE (unchanged) ────────────────────────
+    // ─── APPLICATION STATE ────────────────────────
     let currentTab = 'INVOICE';
     let paymentStatus = 'unpaid';
     let paymentMethod = 'MPESA';
@@ -191,7 +367,7 @@
     const docNumSuffix = { QUOTATION:'0048', INVOICE:'00124', RECEIPT:'00124' };
     const logoURL = 'https://i.ibb.co/0RQfKqkW/1777590981480.png';
 
-    // ─── HELPERS (unchanged) ──────────────────────────────────
+    // ─── HELPERS ──────────────────────────────────
     function fmt(n){ return 'KSH '+Number(n).toLocaleString('en-KE',{minimumFractionDigits:2,maximumFractionDigits:2});}
     function fmtPlain(n){ return Number(n).toLocaleString('en-KE',{minimumFractionDigits:2,maximumFractionDigits:2});}
     function calcTotals(){
@@ -244,7 +420,7 @@
     function setPayment(s){paymentStatus=s;document.querySelectorAll('.status-pill').forEach(p=>p.className='status-pill');const pill=document.getElementById('pill_'+s);if(pill)pill.classList.add('active-'+s);}
     function updateField(k,v){formData[k]=v;if(k==='invoiceNo')document.getElementById('docNumber').textContent=v;}
 
-    // ─── PDF TEMPLATES (unchanged) ────────────────────────────
+    // ─── PDF TEMPLATES ────────────────────────────
     function renderPDFTemplate(){
         const {sub,disc,tax,grand}=calcTotals();
         const tab=currentTab;
@@ -296,7 +472,7 @@
         document.getElementById('pdfTemplate').innerHTML=html;
     }
 
-    // ─── FIXED WHATSAPP SHARING (this part only) ────────────
+    // ─── WHATSAPP SHARING & PDF GENERATION ────────────
     async function generateAndSharePDF(){
         const loadingEl=document.getElementById('loadingOverlay');
         loadingEl.classList.remove('hidden');
@@ -327,7 +503,6 @@
             const {grand}=calcTotals();
             const shareText=`*SUNHANDS AUTO CARE*\n📄 ${currentTab}: ${formData.invoiceNo}\n👤 ${formData.custName}\n🚗 ${formData.vehicleReg}\n💰 Grand Total: ${fmt(grand)}\n📅 ${formData.date}`;
 
-            // Improved sharing flow – try direct share with file first
             try {
                 await navigator.share({
                     title: `Sunhands Auto Care — ${formData.invoiceNo}`,
@@ -336,7 +511,6 @@
                 });
                 showToast('✅ PDF shared!',3000);
             } catch (shareError) {
-                // If direct share fails, download and open WhatsApp with text
                 console.log('Native share failed, falling back to download + WhatsApp text', shareError);
                 const url=URL.createObjectURL(pdfBlob);
                 const a=document.createElement('a');
@@ -384,7 +558,7 @@
         generateAndSharePDF();
     }
 
-    // ─── RENDER MAIN UI (unchanged) ──────────────────────────
+    // ─── RENDER MAIN UI ──────────────────────────
     function render(){
         const {sub,disc,tax,grand}=calcTotals();
         document.getElementById('mainContent').innerHTML=`

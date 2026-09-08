@@ -1666,6 +1666,8 @@
             const data = localStorage.getItem('sunhands_pdfs');
             if (data) {
                 savedPDFs = JSON.parse(data);
+                // Validate that PDFs have valid blob data
+                savedPDFs = savedPDFs.filter(pdf => pdf.blob && pdf.blob.startsWith('data:application/pdf'));
             }
         } catch (e) {
             console.warn('Failed to load saved PDFs:', e);
@@ -1682,7 +1684,7 @@
         }
     }
 
-    // Generate and save PDF
+    // Generate and save PDF - FIXED VERSION
     async function generateAndSavePDF() {
         const loadingEl = document.getElementById('loadingOverlay');
         loadingEl.classList.remove('hidden');
@@ -1692,6 +1694,8 @@
             renderPDFTemplate();
             const templateEl = document.getElementById('pdfTemplate');
             await new Promise(r => setTimeout(r, 400));
+            
+            // Capture as canvas
             const canvas = await html2canvas(templateEl, {
                 scale: 2,
                 useCORS: true,
@@ -1700,6 +1704,7 @@
                 width: templateEl.scrollWidth,
                 height: templateEl.scrollHeight
             });
+            
             const { jsPDF } = window.jspdf;
             const imgData = canvas.toDataURL('image/png');
             const pdfWidth = 210;
@@ -1715,14 +1720,23 @@
                 } 
             }
             
+            // Get PDF as ArrayBuffer for proper storage
             const pdfBlob = pdf.output('blob');
+            
+            // Convert to base64 properly
+            const base64Data = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.readAsDataURL(pdfBlob);
+            });
+            
             let docId;
             if (currentTab === 'WORKORDER') docId = woData.woNumber;
             else if (currentTab === 'CHECKLIST') docId = 'CL-2026-0048';
             else docId = formData.invoiceNo;
             const pdfName = `Sunhands_${currentTab}_${docId.replace(/[/#]/g,'_')}.pdf`;
             
-            // Save to storage
+            // Save to storage with proper base64 data
             const pdfData = {
                 id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
                 name: pdfName,
@@ -1732,31 +1746,22 @@
                 customer: formData.custName,
                 vehicle: formData.vehicleReg,
                 total: fmt(calcTotals().grand),
-                blob: await blobToBase64(pdfBlob)
+                blob: base64Data // Store the full data URL
             };
             
             savedPDFs.unshift(pdfData);
             savePDFsToStorage();
             
             showToast('✅ PDF saved successfully!', 2500);
+            // Refresh if on saved PDFs tab
             if (currentTab === 'SAVEDPDFS') render();
         } catch (err) {
-            console.error(err);
-            showToast('⚠️ Could not save PDF. Try again.', 3500);
+            console.error('Save error:', err);
+            showToast('⚠️ Could not save PDF: ' + err.message, 3500);
         } finally {
             loadingEl.classList.add('hidden');
             document.getElementById('pdfTemplate').innerHTML = '';
         }
-    }
-
-    // Helper: Convert Blob to Base64
-    function blobToBase64(blob) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-        });
     }
 
     // Delete a saved PDF
@@ -1783,13 +1788,20 @@
         }
     }
 
-    // View a saved PDF
+    // View a saved PDF - FIXED VERSION
     function viewSavedPDF(id) {
         const pdf = savedPDFs.find(p => p.id === id);
         if (!pdf) {
             showToast('⚠️ PDF not found', 2000);
             return;
         }
+        
+        // Validate that the blob data is a proper PDF
+        if (!pdf.blob || !pdf.blob.startsWith('data:application/pdf')) {
+            showToast('⚠️ PDF data is corrupted. Please delete and re-save.', 3000);
+            return;
+        }
+        
         try {
             // Open PDF in new tab
             const win = window.open('', '_blank');
@@ -2287,21 +2299,21 @@
             <div class="section-card">
                 <div class="form-body actions">
                     <button class="btn-download full-width" onclick="exportAllPDFs()">
-                        <span class="btn-icon">📦</span> EXPORT ALL PDFs (ZIP)
+                        <span class="btn-icon">📦</span> EXPORT ALL PDFs
                     </button>
                 </div>
             </div>
         `;
     }
 
-    // Export all PDFs as a single download (simplified - downloads individually)
+    // Export all PDFs
     function exportAllPDFs() {
         if (savedPDFs.length === 0) {
             showToast('📭 No PDFs to export', 2000);
             return;
         }
         showToast(`📦 Exporting ${savedPDFs.length} PDFs...`, 3000);
-        // Download each PDF one by one
+        // Download each PDF
         savedPDFs.forEach((pdf, index) => {
             setTimeout(() => {
                 const link = document.createElement('a');

@@ -1684,159 +1684,7 @@
         }
     }
 
-    // Generate and save PDF - FIXED VERSION
-    async function generateAndSavePDF() {
-        const loadingEl = document.getElementById('loadingOverlay');
-        loadingEl.classList.remove('hidden');
-        showToast('📄 Generating PDF…', 4000);
-        try {
-            await loadPdfLibs();
-            renderPDFTemplate();
-            const templateEl = document.getElementById('pdfTemplate');
-            await new Promise(r => setTimeout(r, 400));
-            
-            // Capture as canvas
-            const canvas = await html2canvas(templateEl, {
-                scale: 2,
-                useCORS: true,
-                backgroundColor: '#ffffff',
-                logging: false,
-                width: templateEl.scrollWidth,
-                height: templateEl.scrollHeight
-            });
-            
-            const { jsPDF } = window.jspdf;
-            const imgData = canvas.toDataURL('image/png');
-            const pdfWidth = 210;
-            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, Math.min(pdfHeight, 297));
-            if (pdfHeight > 297) { 
-                let rem = pdfHeight - 297; 
-                while (rem > 0) { 
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', 0, -(297 * (pdf.getNumberOfPages() - 1)), pdfWidth, pdfHeight);
-                    rem -= 297; 
-                } 
-            }
-            
-            // Get PDF as ArrayBuffer for proper storage
-            const pdfBlob = pdf.output('blob');
-            
-            // Convert to base64 properly
-            const base64Data = await new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                reader.readAsDataURL(pdfBlob);
-            });
-            
-            let docId;
-            if (currentTab === 'WORKORDER') docId = woData.woNumber;
-            else if (currentTab === 'CHECKLIST') docId = 'CL-2026-0048';
-            else docId = formData.invoiceNo;
-            const pdfName = `Sunhands_${currentTab}_${docId.replace(/[/#]/g,'_')}.pdf`;
-            
-            // Save to storage with proper base64 data
-            const pdfData = {
-                id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
-                name: pdfName,
-                type: currentTab,
-                docId: docId,
-                date: new Date().toISOString(),
-                customer: formData.custName,
-                vehicle: formData.vehicleReg,
-                total: fmt(calcTotals().grand),
-                blob: base64Data // Store the full data URL
-            };
-            
-            savedPDFs.unshift(pdfData);
-            savePDFsToStorage();
-            
-            showToast('✅ PDF saved successfully!', 2500);
-            // Refresh if on saved PDFs tab
-            if (currentTab === 'SAVEDPDFS') render();
-        } catch (err) {
-            console.error('Save error:', err);
-            showToast('⚠️ Could not save PDF: ' + err.message, 3500);
-        } finally {
-            loadingEl.classList.add('hidden');
-            document.getElementById('pdfTemplate').innerHTML = '';
-        }
-    }
-
-    // Delete a saved PDF
-    function deleteSavedPDF(id) {
-        if (confirm('Are you sure you want to delete this PDF?')) {
-            savedPDFs = savedPDFs.filter(pdf => pdf.id !== id);
-            savePDFsToStorage();
-            showToast('🗑️ PDF deleted!', 2000);
-            render();
-        }
-    }
-
-    // Delete all saved PDFs
-    function deleteAllPDFs() {
-        if (savedPDFs.length === 0) {
-            showToast('📭 No PDFs to delete', 2000);
-            return;
-        }
-        if (confirm('Are you sure you want to delete ALL saved PDFs? This action cannot be undone.')) {
-            savedPDFs = [];
-            savePDFsToStorage();
-            showToast('🗑️ All PDFs deleted!', 2000);
-            render();
-        }
-    }
-
-    // View a saved PDF - FIXED VERSION
-    function viewSavedPDF(id) {
-        const pdf = savedPDFs.find(p => p.id === id);
-        if (!pdf) {
-            showToast('⚠️ PDF not found', 2000);
-            return;
-        }
-        
-        // Validate that the blob data is a proper PDF
-        if (!pdf.blob || !pdf.blob.startsWith('data:application/pdf')) {
-            showToast('⚠️ PDF data is corrupted. Please delete and re-save.', 3000);
-            return;
-        }
-        
-        try {
-            // Open PDF in new tab
-            const win = window.open('', '_blank');
-            if (win) {
-                win.document.write(`
-                    <html>
-                    <head><title>${pdf.name}</title>
-                    <style>
-                        body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f0f2f5; }
-                        embed { width: 100%; height: 100vh; border: none; }
-                    </style>
-                    </head>
-                    <body>
-                        <embed src="${pdf.blob}" type="application/pdf" width="100%" height="100%">
-                    </body>
-                    </html>
-                `);
-                win.document.close();
-            } else {
-                // Fallback: download
-                const link = document.createElement('a');
-                link.href = pdf.blob;
-                link.download = pdf.name;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                showToast('📥 PDF downloaded!', 2000);
-            }
-        } catch (e) {
-            console.error('Error viewing PDF:', e);
-            showToast('⚠️ Could not view PDF', 2000);
-        }
-    }
-
-    // ─── PDF TEMPLATES ────────────────────────────
+    // ─── PDF GENERATION ENGINE ──────────────────────
     function renderPDFTemplate() {
         const { sub, disc, tax, grand } = calcTotals();
         const tab = currentTab;
@@ -1993,6 +1841,204 @@
                 </div>`;
         }
         document.getElementById('pdfTemplate').innerHTML = html;
+    }
+
+    // ─── GENERATE & SAVE PDF ──────────────────────
+    async function generateAndSavePDF() {
+        const loadingEl = document.getElementById('loadingOverlay');
+        loadingEl.classList.remove('hidden');
+        showToast('📄 Generating PDF…', 4000);
+        try {
+            await loadPdfLibs();
+            renderPDFTemplate();
+            const templateEl = document.getElementById('pdfTemplate');
+            await new Promise(r => setTimeout(r, 400));
+            
+            const canvas = await html2canvas(templateEl, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#ffffff',
+                logging: false,
+                width: templateEl.scrollWidth,
+                height: templateEl.scrollHeight
+            });
+            
+            const { jsPDF } = window.jspdf;
+            const imgData = canvas.toDataURL('image/png');
+            const pdfWidth = 210;
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, Math.min(pdfHeight, 297));
+            if (pdfHeight > 297) { 
+                let rem = pdfHeight - 297; 
+                while (rem > 0) { 
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, -(297 * (pdf.getNumberOfPages() - 1)), pdfWidth, pdfHeight);
+                    rem -= 297; 
+                } 
+            }
+            
+            const pdfBlob = pdf.output('blob');
+            
+            // Convert to base64 properly
+            const base64Data = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.readAsDataURL(pdfBlob);
+            });
+            
+            let docId;
+            if (currentTab === 'WORKORDER') docId = woData.woNumber;
+            else if (currentTab === 'CHECKLIST') docId = 'CL-2026-0048';
+            else docId = formData.invoiceNo;
+            const pdfName = `Sunhands_${currentTab}_${docId.replace(/[/#]/g,'_')}.pdf`;
+            
+            const pdfData = {
+                id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+                name: pdfName,
+                type: currentTab,
+                docId: docId,
+                date: new Date().toISOString(),
+                customer: formData.custName,
+                vehicle: formData.vehicleReg,
+                total: fmt(calcTotals().grand),
+                blob: base64Data
+            };
+            
+            savedPDFs.unshift(pdfData);
+            savePDFsToStorage();
+            
+            showToast('✅ PDF saved successfully!', 2500);
+            if (currentTab === 'SAVEDPDFS') render();
+        } catch (err) {
+            console.error('Save error:', err);
+            showToast('⚠️ Could not save PDF: ' + err.message, 3500);
+        } finally {
+            loadingEl.classList.add('hidden');
+            document.getElementById('pdfTemplate').innerHTML = '';
+        }
+    }
+
+    // ─── DELETE PDF FUNCTIONS ──────────────────────
+    function deleteSavedPDF(id) {
+        if (confirm('Are you sure you want to delete this PDF?')) {
+            savedPDFs = savedPDFs.filter(pdf => pdf.id !== id);
+            savePDFsToStorage();
+            showToast('🗑️ PDF deleted!', 2000);
+            render();
+        }
+    }
+
+    function deleteAllPDFs() {
+        if (savedPDFs.length === 0) {
+            showToast('📭 No PDFs to delete', 2000);
+            return;
+        }
+        if (confirm('Are you sure you want to delete ALL saved PDFs? This action cannot be undone.')) {
+            savedPDFs = [];
+            savePDFsToStorage();
+            showToast('🗑️ All PDFs deleted!', 2000);
+            render();
+        }
+    }
+
+    // ─── VIEW SAVED PDF ────────────────────────────
+    function viewSavedPDF(id) {
+        const pdf = savedPDFs.find(p => p.id === id);
+        if (!pdf) {
+            showToast('⚠️ PDF not found', 2000);
+            return;
+        }
+        
+        if (!pdf.blob || !pdf.blob.startsWith('data:application/pdf')) {
+            showToast('⚠️ PDF data is corrupted. Please delete and re-save.', 3000);
+            return;
+        }
+        
+        try {
+            const win = window.open('', '_blank');
+            if (win) {
+                win.document.write(`
+                    <html>
+                    <head><title>${pdf.name}</title>
+                    <style>
+                        body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f0f2f5; }
+                        embed { width: 100%; height: 100vh; border: none; }
+                        .fallback { text-align: center; padding: 40px; }
+                        .fallback a { color: #2563eb; text-decoration: underline; cursor: pointer; }
+                    </style>
+                    </head>
+                    <body>
+                        <embed src="${pdf.blob}" type="application/pdf" width="100%" height="100%">
+                        <div class="fallback" style="display:none;">
+                            <p>PDF cannot be displayed directly.</p>
+                            <a onclick="window.location.href='${pdf.blob}'">Click here to download</a>
+                        </div>
+                        <script>
+                            setTimeout(() => {
+                                const embed = document.querySelector('embed');
+                                if (embed && embed.style.display !== 'none') {
+                                    // Check if PDF loaded successfully
+                                    setTimeout(() => {
+                                        try {
+                                            if (embed.getClientRects().length === 0 || embed.offsetHeight === 0) {
+                                                document.querySelector('.fallback').style.display = 'block';
+                                                embed.style.display = 'none';
+                                            }
+                                        } catch(e) {
+                                            // Fallback to download
+                                            window.location.href = '${pdf.blob}';
+                                        }
+                                    }, 2000);
+                                }
+                            }, 1000);
+                        <\/script>
+                    </body>
+                    </html>
+                `);
+                win.document.close();
+            } else {
+                const link = document.createElement('a');
+                link.href = pdf.blob;
+                link.download = pdf.name;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showToast('📥 PDF downloaded!', 2000);
+            }
+        } catch (e) {
+            console.error('Error viewing PDF:', e);
+            showToast('⚠️ Could not view PDF. Downloading instead.', 2000);
+            // Fallback: download
+            const link = document.createElement('a');
+            link.href = pdf.blob;
+            link.download = pdf.name;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+
+    // ─── EXPORT ALL PDFs ────────────────────────────
+    function exportAllPDFs() {
+        if (savedPDFs.length === 0) {
+            showToast('📭 No PDFs to export', 2000);
+            return;
+        }
+        showToast(`📦 Exporting ${savedPDFs.length} PDFs...`, 3000);
+        savedPDFs.forEach((pdf, index) => {
+            setTimeout(() => {
+                const link = document.createElement('a');
+                link.href = pdf.blob;
+                link.download = pdf.name;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                if (index === savedPDFs.length - 1) {
+                    showToast('✅ All PDFs exported!', 2000);
+                }
+            }, index * 500);
+        });
     }
 
     // ─── SHARING & DOWNLOAD FUNCTIONS ──────────────
@@ -2304,29 +2350,6 @@
                 </div>
             </div>
         `;
-    }
-
-    // Export all PDFs
-    function exportAllPDFs() {
-        if (savedPDFs.length === 0) {
-            showToast('📭 No PDFs to export', 2000);
-            return;
-        }
-        showToast(`📦 Exporting ${savedPDFs.length} PDFs...`, 3000);
-        // Download each PDF
-        savedPDFs.forEach((pdf, index) => {
-            setTimeout(() => {
-                const link = document.createElement('a');
-                link.href = pdf.blob;
-                link.download = pdf.name;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                if (index === savedPDFs.length - 1) {
-                    showToast('✅ All PDFs exported!', 2000);
-                }
-            }, index * 500);
-        });
     }
 
     // ─── RENDER MAIN UI ──────────────────────────

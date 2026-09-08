@@ -83,6 +83,14 @@
         .logo-text .brand { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: clamp(18px, 3.5vw, 26px); color: #fff; letter-spacing: 2px; line-height: 1.1; }
         .logo-text .tagline { font-size: clamp(10px, 1.4vw, 13px); color: var(--gold); letter-spacing: 2.5px; text-transform: uppercase; font-weight: 600; }
         .doc-number { background: rgba(34,197,94,0.18); border: 2px solid rgba(34,197,94,0.4); border-radius: 10px; padding: 8px 16px; font-size: clamp(13px, 1.5vw, 18px); color: var(--green); font-weight: 700; letter-spacing: 1.5px; font-family: 'Rajdhani', sans-serif; white-space: nowrap; min-height: 44px; display: flex; align-items: center; }
+        .sync-status { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--muted); padding: 4px 12px; background: rgba(255,255,255,0.05); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all var(--transition); }
+        .sync-status:hover { background: rgba(255,255,255,0.1); }
+        .sync-status .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .sync-status .dot.synced { background: var(--green); }
+        .sync-status .dot.unsynced { background: var(--orange); animation: pulse 1.5s ease-in-out infinite; }
+        .sync-status .dot.error { background: var(--red); }
+        .sync-status .dot.syncing { background: var(--blue); animation: pulse 0.8s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
         /* ======================== TABS ======================== */
         .tabs { display: flex; gap: 6px; flex-wrap: wrap; padding-bottom: 2px; }
@@ -144,7 +152,7 @@
         .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 4px 0; }
         .actions .full-width { grid-column: 1 / -1; }
 
-        .btn-whatsapp, .btn-download, .btn-save, .btn-delete-all {
+        .btn-whatsapp, .btn-download, .btn-save, .btn-delete-all, .btn-sync {
             display: flex; align-items: center; justify-content: center; gap: 12px; border: none; border-radius: 14px;
             font-family: 'Rajdhani', sans-serif; font-weight: 700; letter-spacing: 2px; cursor: pointer;
             transition: all var(--transition); color: #fff; padding: 16px 20px;
@@ -162,6 +170,9 @@
         .btn-delete-all { background: linear-gradient(135deg, #dc2626, #b91c1c); box-shadow: 0 4px 20px rgba(220,38,38,0.35); }
         .btn-delete-all:hover { transform: translateY(-3px) scale(1.01); box-shadow: 0 8px 32px rgba(220,38,38,0.45); }
         .btn-delete-all:active { transform: translateY(0px) scale(0.98); }
+        .btn-sync { background: linear-gradient(135deg, #7c3aed, #6d28d9); box-shadow: 0 4px 20px rgba(124,58,237,0.35); }
+        .btn-sync:hover { transform: translateY(-3px) scale(1.01); box-shadow: 0 8px 32px rgba(124,58,237,0.45); }
+        .btn-sync:active { transform: translateY(0px) scale(0.98); }
         .btn-icon { font-size: clamp(20px, 1.6vw, 28px); }
 
         /* ======================== SAVED PDFs SECTION ======================== */
@@ -177,6 +188,8 @@
         .pdf-item .pdf-btn-view:hover { background: #2563eb; transform: scale(1.05); }
         .pdf-item .pdf-btn-delete { background: #fee2e2; color: #991b1b; }
         .pdf-item .pdf-btn-delete:hover { background: #fecaca; transform: scale(1.05); }
+        .pdf-item .pdf-btn-sync { background: #ede9fe; color: #6d28d9; }
+        .pdf-item .pdf-btn-sync:hover { background: #ddd6fe; transform: scale(1.05); }
         .pdf-empty { text-align: center; padding: 30px 20px; color: var(--muted); font-size: clamp(14px, 1.2vw, 18px); }
         .pdf-empty .empty-icon { font-size: 48px; margin-bottom: 12px; }
         .pdf-stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
@@ -277,8 +290,8 @@
 
         /* ======================== RESPONSIVE ======================== */
         @media (min-width: 768px) { .content { padding: 20px 28px; } .field-row { grid-template-columns: 1fr 1fr 1fr; } .field-row.two-col { grid-template-columns: 1fr 1fr; } .field-row.four-col { grid-template-columns: 1fr 1fr 1fr 1fr; } .checklist-item { grid-template-columns: 1fr 90px 90px 70px; padding: 10px 18px; } .section-header { padding: 16px 24px; } .form-body { padding: 18px 24px; } .items-table { min-width: 550px; } .items-table td { padding: 10px 12px; } .items-table td input { padding: 10px 10px; } .grand-total-row { padding: 18px 28px; } .actions { grid-template-columns: 1fr 1fr; } .tab { min-width: 100px; padding: 16px 16px; font-size: clamp(14px, 1.3vw, 18px); } .pdf-item { grid-template-columns: 1fr auto auto; } }
-        @media (min-width: 1024px) { .content { padding: 28px 40px; max-width: 1200px; } .app-header { padding: 18px 40px 0; } .logo-row { margin-bottom: 14px; } .logo-icon { width: 60px; height: 60px; } .tabs { gap: 8px; } .tab { padding: 18px 28px; font-size: 17px; min-width: 120px; min-height: 62px; border-radius: 10px 10px 0 0; } .field-row { grid-template-columns: 1fr 1fr 1fr 1fr; } .field-row.two-col { grid-template-columns: 1fr 1fr; } .field-row.three-col { grid-template-columns: 1fr 1fr 1fr; } .section-card { margin-bottom: 24px; border-radius: 18px; } .section-header { padding: 18px 28px; } .section-title { font-size: 18px; } .form-body { padding: 22px 28px; } .field input, .field select, .field textarea { padding: 14px 18px; font-size: 16px; border-radius: 12px; min-height: 54px; } .items-table { min-width: 450px; } .items-table th { padding: 16px 14px; font-size: 13px; } .items-table td { padding: 12px 14px; } .items-table td input { padding: 10px 12px; font-size: 14px; min-height: 44px; } .checklist-item { grid-template-columns: 1fr 110px 110px 80px; padding: 12px 20px; font-size: 14px; min-height: 58px; } .checklist-item .item-label { font-size: 14px; } .checklist-item .item-status label { font-size: 11px; } .checklist-item .item-status input[type="radio"] { width: 20px; height: 20px; } .checklist-category { padding: 12px 20px; font-size: 14px; min-height: 48px; } .checklist-summary .stat { padding: 10px 22px; font-size: 15px; min-height: 48px; } .checklist-summary .stat .num { font-size: 22px; } .btn-whatsapp, .btn-download, .btn-save, .btn-delete-all { padding: 18px 28px; font-size: 18px; border-radius: 14px; min-height: 62px; } .grand-total-row { padding: 20px 32px; border-radius: 14px; } .grand-total-row .label { font-size: 18px; } .grand-total-row .val { font-size: 28px; } .float-chat { bottom: 36px; right: 36px; } .float-share-btn { width: 80px; height: 80px; } .float-share-btn svg { width: 38px; height: 38px; } .pulse-ring { width: 80px; height: 80px; } .toast { top: 100px; padding: 16px 36px; font-size: 17px; border-left-width: 6px; min-height: 58px; } .status-pill { padding: 10px 24px; font-size: 14px; min-height: 48px; } .wo-status-pill { padding: 10px 24px; font-size: 14px; min-height: 48px; } .add-row-btn { padding: 16px 24px; font-size: 17px; min-height: 60px; } #installBtn { padding: 16px 28px; font-size: 15px; min-height: 56px; } .share-badge { font-size: 10px; padding: 4px 12px; min-height: 28px; } .pdf-item { padding: 16px 20px; } .pdf-item .pdf-name { font-size: 16px; } .pdf-item .pdf-btn { padding: 10px 18px; font-size: 13px; min-height: 42px; } .pdf-stats .stat { padding: 10px 20px; font-size: 14px; } .pdf-stats .stat .num { font-size: 22px; } }
-        @media (max-width: 480px) { .field-row { grid-template-columns: 1fr; } .field-row.three-col { grid-template-columns: 1fr; } .field-row.four-col { grid-template-columns: 1fr; } .signature-grid { grid-template-columns: 1fr; } .actions { grid-template-columns: 1fr; } .checklist-item { grid-template-columns: 1fr 52px 52px 46px; padding: 8px 10px; font-size: 11px; min-height: 44px; } .checklist-item .item-status label { font-size: 8px; padding: 2px 4px; } .checklist-item .item-status input[type="radio"] { width: 15px; height: 15px; } .checklist-item .item-label { font-size: 10px; } .checklist-category { font-size: 10px; padding: 8px 12px; min-height: 36px; } .checklist-summary .stat { font-size: 11px; padding: 6px 12px; min-height: 36px; } .checklist-summary .stat .num { font-size: 16px; } .logo-text .brand { font-size: 17px; } .logo-icon { width: 42px; height: 42px; } .doc-number { font-size: 12px; padding: 6px 12px; min-height: 36px; } .tab { min-width: 50px; padding: 10px 4px; font-size: clamp(10px, 2.2vw, 13px); min-height: 44px; gap: 4px; } .items-table td input { font-size: 10px; padding: 6px 4px; min-height: 34px; } .items-table td input.code { width: 44px; } .items-table td input.num { width: 38px; } .items-table td input.price { width: 54px; } .row-total { font-size: 11px; } .btn-whatsapp, .btn-download, .btn-save, .btn-delete-all { font-size: 13px; padding: 14px 16px; min-height: 48px; letter-spacing: 1.5px; } .grand-total-row { padding: 14px 18px; } .grand-total-row .label { font-size: 13px; } .grand-total-row .val { font-size: 18px; } .float-share-btn { width: 60px; height: 60px; } .float-share-btn svg { width: 28px; height: 28px; } .pulse-ring { width: 60px; height: 60px; } .toast { font-size: 13px; padding: 12px 18px; top: 75px; min-height: 44px; } #installBtn { padding: 10px 16px; font-size: 11px; bottom: 95px; right: 16px; min-height: 44px; } .status-pill { padding: 6px 14px; font-size: 10px; min-height: 36px; } .wo-status-pill { padding: 6px 14px; font-size: 10px; min-height: 36px; } .add-row-btn { padding: 12px 16px; font-size: 13px; min-height: 48px; } .share-badge { font-size: 8px; padding: 3px 8px; min-height: 20px; top: -8px; right: -8px; } .section-header { padding: 12px 14px; } .section-title { font-size: 12px; } .form-body { padding: 12px 14px; } .field input, .field select, .field textarea { padding: 10px 12px; font-size: 13px; min-height: 42px; } .field label { font-size: 9px; } .adj-row input { width: 70px; padding: 6px 10px; min-height: 38px; } .kra-badge { font-size: 10px; padding: 4px 14px; min-height: 36px; } .items-table { min-width: 500px; } .items-table th { padding: 10px 6px; font-size: 9px; } .items-table td { padding: 6px 4px; } .pdf-item { grid-template-columns: 1fr; gap: 8px; padding: 12px 14px; } .pdf-item .pdf-actions { justify-content: flex-start; } .pdf-stats .stat { font-size: 10px; padding: 4px 10px; } .pdf-stats .stat .num { font-size: 14px; } }
+        @media (min-width: 1024px) { .content { padding: 28px 40px; max-width: 1200px; } .app-header { padding: 18px 40px 0; } .logo-row { margin-bottom: 14px; } .logo-icon { width: 60px; height: 60px; } .tabs { gap: 8px; } .tab { padding: 18px 28px; font-size: 17px; min-width: 120px; min-height: 62px; border-radius: 10px 10px 0 0; } .field-row { grid-template-columns: 1fr 1fr 1fr 1fr; } .field-row.two-col { grid-template-columns: 1fr 1fr; } .field-row.three-col { grid-template-columns: 1fr 1fr 1fr; } .section-card { margin-bottom: 24px; border-radius: 18px; } .section-header { padding: 18px 28px; } .section-title { font-size: 18px; } .form-body { padding: 22px 28px; } .field input, .field select, .field textarea { padding: 14px 18px; font-size: 16px; border-radius: 12px; min-height: 54px; } .items-table { min-width: 450px; } .items-table th { padding: 16px 14px; font-size: 13px; } .items-table td { padding: 12px 14px; } .items-table td input { padding: 10px 12px; font-size: 14px; min-height: 44px; } .checklist-item { grid-template-columns: 1fr 110px 110px 80px; padding: 12px 20px; font-size: 14px; min-height: 58px; } .checklist-item .item-label { font-size: 14px; } .checklist-item .item-status label { font-size: 11px; } .checklist-item .item-status input[type="radio"] { width: 20px; height: 20px; } .checklist-category { padding: 12px 20px; font-size: 14px; min-height: 48px; } .checklist-summary .stat { padding: 10px 22px; font-size: 15px; min-height: 48px; } .checklist-summary .stat .num { font-size: 22px; } .btn-whatsapp, .btn-download, .btn-save, .btn-delete-all, .btn-sync { padding: 18px 28px; font-size: 18px; border-radius: 14px; min-height: 62px; } .grand-total-row { padding: 20px 32px; border-radius: 14px; } .grand-total-row .label { font-size: 18px; } .grand-total-row .val { font-size: 28px; } .float-chat { bottom: 36px; right: 36px; } .float-share-btn { width: 80px; height: 80px; } .float-share-btn svg { width: 38px; height: 38px; } .pulse-ring { width: 80px; height: 80px; } .toast { top: 100px; padding: 16px 36px; font-size: 17px; border-left-width: 6px; min-height: 58px; } .status-pill { padding: 10px 24px; font-size: 14px; min-height: 48px; } .wo-status-pill { padding: 10px 24px; font-size: 14px; min-height: 48px; } .add-row-btn { padding: 16px 24px; font-size: 17px; min-height: 60px; } #installBtn { padding: 16px 28px; font-size: 15px; min-height: 56px; } .share-badge { font-size: 10px; padding: 4px 12px; min-height: 28px; } .pdf-item { padding: 16px 20px; } .pdf-item .pdf-name { font-size: 16px; } .pdf-item .pdf-btn { padding: 10px 18px; font-size: 13px; min-height: 42px; } .pdf-stats .stat { padding: 10px 20px; font-size: 14px; } .pdf-stats .stat .num { font-size: 22px; } }
+        @media (max-width: 480px) { .field-row { grid-template-columns: 1fr; } .field-row.three-col { grid-template-columns: 1fr; } .field-row.four-col { grid-template-columns: 1fr; } .signature-grid { grid-template-columns: 1fr; } .actions { grid-template-columns: 1fr; } .checklist-item { grid-template-columns: 1fr 52px 52px 46px; padding: 8px 10px; font-size: 11px; min-height: 44px; } .checklist-item .item-status label { font-size: 8px; padding: 2px 4px; } .checklist-item .item-status input[type="radio"] { width: 15px; height: 15px; } .checklist-item .item-label { font-size: 10px; } .checklist-category { font-size: 10px; padding: 8px 12px; min-height: 36px; } .checklist-summary .stat { font-size: 11px; padding: 6px 12px; min-height: 36px; } .checklist-summary .stat .num { font-size: 16px; } .logo-text .brand { font-size: 17px; } .logo-icon { width: 42px; height: 42px; } .doc-number { font-size: 12px; padding: 6px 12px; min-height: 36px; } .tab { min-width: 50px; padding: 10px 4px; font-size: clamp(10px, 2.2vw, 13px); min-height: 44px; gap: 4px; } .items-table td input { font-size: 10px; padding: 6px 4px; min-height: 34px; } .items-table td input.code { width: 44px; } .items-table td input.num { width: 38px; } .items-table td input.price { width: 54px; } .row-total { font-size: 11px; } .btn-whatsapp, .btn-download, .btn-save, .btn-delete-all, .btn-sync { font-size: 13px; padding: 14px 16px; min-height: 48px; letter-spacing: 1.5px; } .grand-total-row { padding: 14px 18px; } .grand-total-row .label { font-size: 13px; } .grand-total-row .val { font-size: 18px; } .float-share-btn { width: 60px; height: 60px; } .float-share-btn svg { width: 28px; height: 28px; } .pulse-ring { width: 60px; height: 60px; } .toast { font-size: 13px; padding: 12px 18px; top: 75px; min-height: 44px; } #installBtn { padding: 10px 16px; font-size: 11px; bottom: 95px; right: 16px; min-height: 44px; } .status-pill { padding: 6px 14px; font-size: 10px; min-height: 36px; } .wo-status-pill { padding: 6px 14px; font-size: 10px; min-height: 36px; } .add-row-btn { padding: 12px 16px; font-size: 13px; min-height: 48px; } .share-badge { font-size: 8px; padding: 3px 8px; min-height: 20px; top: -8px; right: -8px; } .section-header { padding: 12px 14px; } .section-title { font-size: 12px; } .form-body { padding: 12px 14px; } .field input, .field select, .field textarea { padding: 10px 12px; font-size: 13px; min-height: 42px; } .field label { font-size: 9px; } .adj-row input { width: 70px; padding: 6px 10px; min-height: 38px; } .kra-badge { font-size: 10px; padding: 4px 14px; min-height: 36px; } .items-table { min-width: 500px; } .items-table th { padding: 10px 6px; font-size: 9px; } .items-table td { padding: 6px 4px; } .pdf-item { grid-template-columns: 1fr; gap: 8px; padding: 12px 14px; } .pdf-item .pdf-actions { justify-content: flex-start; } .pdf-stats .stat { font-size: 10px; padding: 4px 10px; } .pdf-stats .stat .num { font-size: 14px; } }
 
         /* ======================== SCROLLBAR ======================== */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -302,6 +315,10 @@
             <div class="tagline">Professional Auto Services</div>
         </div>
         <div class="doc-number" id="docNumber">INV-0001</div>
+        <div class="sync-status" id="syncStatus" onclick="syncAllToNeon()" title="Click to sync all documents">
+            <span class="dot" id="syncDot"></span>
+            <span id="syncLabel">Local</span>
+        </div>
     </div>
     <div class="tabs">
         <button class="tab" onclick="switchTab('QUOTATION', this)">
@@ -359,6 +376,286 @@
 <button id="installBtn">📲 INSTALL APP</button>
 
 <script>
+    // ================================================================
+    // NEON DATABASE CONFIGURATION
+    // ================================================================
+    const NEON_CONFIG = {
+        // Your Neon REST API endpoint
+        baseUrl: 'https://ep-young-bird-amg5lpem.apirest.c-5.us-east-1.aws.neon.tech/neondb/rest/v1',
+        
+        // API Key for authentication (if required by Neon)
+        // Get this from your Neon dashboard under "API Keys"
+        apiKey: '', // Replace with your actual API key if needed
+        
+        // Table name for storing documents
+        tableName: 'documents'
+    };
+
+    // ================================================================
+    // NEON REST API SYNC ENGINE
+    // ================================================================
+    const NeonSync = {
+        // Track sync status
+        status: 'local', // 'local', 'synced', 'error', 'syncing'
+        pendingSync: false,
+        
+        // Initialize sync engine
+        init() {
+            this.updateUI();
+            // Check for pending documents that need syncing
+            this.checkPendingSync();
+            // Test connection
+            this.testConnection();
+        },
+        
+        // Update UI sync status
+        updateUI() {
+            const dot = document.getElementById('syncDot');
+            const label = document.getElementById('syncLabel');
+            if (!dot || !label) return;
+            
+            switch(this.status) {
+                case 'synced':
+                    dot.className = 'dot synced';
+                    label.textContent = '☁️ Synced';
+                    break;
+                case 'error':
+                    dot.className = 'dot error';
+                    label.textContent = '⚠️ Error';
+                    break;
+                case 'syncing':
+                    dot.className = 'dot syncing';
+                    label.textContent = '⏳ Syncing…';
+                    break;
+                default:
+                    dot.className = 'dot unsynced';
+                    label.textContent = '💾 Local';
+                    break;
+            }
+        },
+        
+        // Test connection to Neon
+        async testConnection() {
+            try {
+                const response = await this.apiRequest('GET', '');
+                if (response.ok) {
+                    console.log('✅ Neon API connected successfully');
+                    return true;
+                } else {
+                    console.warn('⚠️ Neon API connection test failed:', response.status);
+                    this.status = 'error';
+                    this.updateUI();
+                    return false;
+                }
+            } catch (error) {
+                console.warn('⚠️ Neon API connection error:', error.message);
+                this.status = 'error';
+                this.updateUI();
+                return false;
+            }
+        },
+        
+        // Make a request to the Neon REST API
+        async apiRequest(method, path, data = null) {
+            const headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            };
+            
+            // Add API key if provided
+            if (NEON_CONFIG.apiKey) {
+                headers['Authorization'] = `Bearer ${NEON_CONFIG.apiKey}`;
+            }
+            
+            const url = `${NEON_CONFIG.baseUrl}${path}`;
+            
+            const options = {
+                method: method,
+                headers: headers
+            };
+            
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+            
+            const response = await fetch(url, options);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Neon API error (${response.status}): ${errorText}`);
+            }
+            
+            return response;
+        },
+        
+        // Check if there are documents that need syncing
+        checkPendingSync() {
+            loadSavedPDFs();
+            const unsynced = savedPDFs.filter(pdf => !pdf._synced);
+            if (unsynced.length > 0) {
+                this.pendingSync = true;
+                this.status = 'local';
+                this.updateUI();
+            } else {
+                this.pendingSync = false;
+                this.status = 'synced';
+                this.updateUI();
+            }
+        },
+        
+        // Sync a single document to Neon
+        async syncDocument(pdf) {
+            try {
+                this.status = 'syncing';
+                this.updateUI();
+                
+                // Prepare the document for sync
+                const docData = {
+                    id: pdf.id,
+                    name: pdf.name,
+                    type: pdf.type,
+                    customer: pdf.customer || '',
+                    vehicle: pdf.vehicle || '',
+                    total: pdf.total || '',
+                    date: pdf.date || new Date().toISOString(),
+                    html_content: pdf.htmlContent || '',
+                    synced_at: new Date().toISOString()
+                };
+                
+                // Check if document already exists in Neon
+                const checkResponse = await this.apiRequest('GET', `/${NEON_CONFIG.tableName}?id=eq.${encodeURIComponent(pdf.id)}`);
+                const existingDocs = await checkResponse.json();
+                
+                let response;
+                if (existingDocs && existingDocs.length > 0) {
+                    // Update existing document
+                    response = await this.apiRequest('PATCH', `/${NEON_CONFIG.tableName}?id=eq.${encodeURIComponent(pdf.id)}`, docData);
+                } else {
+                    // Insert new document
+                    response = await this.apiRequest('POST', `/${NEON_CONFIG.tableName}`, docData);
+                }
+                
+                if (response.ok) {
+                    // Mark as synced locally
+                    pdf._synced = true;
+                    pdf._syncedAt = new Date().toISOString();
+                    localStorage.setItem('sunhands_saved_pdfs', JSON.stringify(savedPDFs));
+                    
+                    this.status = 'synced';
+                    this.updateUI();
+                    showToast('✅ Document synced to cloud!', 3000);
+                    return true;
+                } else {
+                    throw new Error(`Sync failed with status ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Sync error:', error);
+                this.status = 'error';
+                this.updateUI();
+                showToast('⚠️ Sync failed: ' + error.message, 4000);
+                return false;
+            }
+        },
+        
+        // Sync all unsynced documents
+        async syncAll() {
+            loadSavedPDFs();
+            const unsynced = savedPDFs.filter(pdf => !pdf._synced);
+            
+            if (unsynced.length === 0) {
+                showToast('✅ All documents are already synced!', 2000);
+                return;
+            }
+            
+            showToast(`🔄 Syncing ${unsynced.length} document(s)...`, 3000);
+            
+            let successCount = 0;
+            for (const pdf of unsynced) {
+                const success = await this.syncDocument(pdf);
+                if (success) successCount++;
+            }
+            
+            if (successCount === unsynced.length) {
+                showToast(`✅ All ${successCount} document(s) synced successfully!`, 3000);
+            } else {
+                showToast(`⚠️ ${successCount}/${unsynced.length} documents synced.`, 4000);
+            }
+            
+            this.checkPendingSync();
+            if (currentTab === 'SAVEDPDFS') render();
+        },
+        
+        // Load documents from Neon (pull)
+        async pullFromNeon() {
+            try {
+                this.status = 'syncing';
+                this.updateUI();
+                showToast('📥 Pulling documents from cloud...', 3000);
+                
+                const response = await this.apiRequest('GET', `/${NEON_CONFIG.tableName}?order=synced_at.desc`);
+                const documents = await response.json();
+                
+                if (documents && documents.length > 0) {
+                    loadSavedPDFs();
+                    
+                    // Merge documents (avoid duplicates by id)
+                    const existingIds = new Set(savedPDFs.map(p => p.id));
+                    let addedCount = 0;
+                    
+                    for (const doc of documents) {
+                        if (!existingIds.has(doc.id)) {
+                            // Convert from database format to app format
+                            const newDoc = {
+                                id: doc.id,
+                                name: doc.name,
+                                type: doc.type,
+                                customer: doc.customer || 'N/A',
+                                vehicle: doc.vehicle || 'N/A',
+                                total: doc.total || 'N/A',
+                                date: doc.date || new Date().toISOString(),
+                                htmlContent: doc.html_content || '',
+                                _synced: true,
+                                _syncedAt: doc.synced_at || new Date().toISOString()
+                            };
+                            savedPDFs.push(newDoc);
+                            addedCount++;
+                        } else {
+                            // Update existing document's sync status
+                            const existing = savedPDFs.find(p => p.id === doc.id);
+                            if (existing) {
+                                existing._synced = true;
+                                existing._syncedAt = doc.synced_at || new Date().toISOString();
+                            }
+                        }
+                    }
+                    
+                    if (addedCount > 0) {
+                        localStorage.setItem('sunhands_saved_pdfs', JSON.stringify(savedPDFs));
+                        showToast(`📥 Pulled ${addedCount} new document(s) from cloud!`, 3000);
+                    } else {
+                        showToast('✅ Already up to date with cloud.', 2000);
+                    }
+                    
+                    this.status = 'synced';
+                    this.updateUI();
+                    if (currentTab === 'SAVEDPDFS') render();
+                    return true;
+                } else {
+                    showToast('📭 No documents found in cloud.', 2000);
+                    this.status = 'synced';
+                    this.updateUI();
+                    return false;
+                }
+            } catch (error) {
+                console.error('Pull error:', error);
+                this.status = 'error';
+                this.updateUI();
+                showToast('⚠️ Failed to pull from cloud: ' + error.message, 4000);
+                return false;
+            }
+        }
+    };
+
     // ================================================================
     // PWA: Service Worker registration
     // ================================================================
@@ -664,14 +961,32 @@
                     vehicle: vehicleReg,
                     total: formattedTotal,
                     date: new Date().toISOString(),
-                    htmlContent: docHtml
+                    htmlContent: docHtml,
+                    _synced: false, // Mark as unsynced initially
+                    _syncedAt: null
                 };
 
                 loadSavedPDFs();
                 savedPDFs.unshift(newPdfRecord);
                 localStorage.setItem('sunhands_saved_pdfs', JSON.stringify(savedPDFs));
 
-                showToast('✅ PDF Document saved successfully to local archive!');
+                // Update sync status
+                NeonSync.status = 'local';
+                NeonSync.updateUI();
+                NeonSync.pendingSync = true;
+
+                showToast('✅ PDF Document saved to local archive!');
+
+                // Auto-sync if possible
+                if (navigator.onLine) {
+                    setTimeout(() => {
+                        NeonSync.syncDocument(newPdfRecord).then(success => {
+                            if (success) {
+                                showToast('☁️ Document synced to cloud!', 2000);
+                            }
+                        });
+                    }, 1000);
+                }
             } catch (err) {
                 console.error('Error saving PDF:', err);
                 showToast('⚠️ Failed to save PDF. LocalStorage quota may be exceeded.');
@@ -680,6 +995,38 @@
                 if (currentTab === 'SAVEDPDFS') render();
             }
         }, 500);
+    }
+
+    // Sync a single saved PDF to Neon
+    async function syncSavedPDF(id) {
+        loadSavedPDFs();
+        const pdf = savedPDFs.find(item => item.id === id);
+        if (!pdf) {
+            showToast('⚠️ Document not found.');
+            return;
+        }
+        
+        if (pdf._synced) {
+            showToast('✅ Document is already synced!', 2000);
+            return;
+        }
+        
+        const success = await NeonSync.syncDocument(pdf);
+        if (success) {
+            render();
+        }
+    }
+
+    // Sync all documents to Neon
+    async function syncAllToNeon() {
+        await NeonSync.syncAll();
+        render();
+    }
+
+    // Pull all documents from Neon
+    async function pullFromNeon() {
+        await NeonSync.pullFromNeon();
+        render();
     }
 
     // View / Print saved PDF in a new window/tab
@@ -711,7 +1058,16 @@
         loadSavedPDFs();
         savedPDFs = savedPDFs.filter(item => item.id !== id);
         localStorage.setItem('sunhands_saved_pdfs', JSON.stringify(savedPDFs));
+        
+        // Also try to delete from Neon
+        try {
+            NeonSync.apiRequest('DELETE', `/${NEON_CONFIG.tableName}?id=eq.${encodeURIComponent(id)}`)
+                .then(() => console.log('Deleted from Neon:', id))
+                .catch(() => console.log('Could not delete from Neon (maybe not synced)'));
+        } catch(e) {}
+        
         showToast('🗑️ Document removed from archive.');
+        NeonSync.checkPendingSync();
         render();
     }
 
@@ -721,6 +1077,7 @@
         savedPDFs = [];
         localStorage.setItem('sunhands_saved_pdfs', JSON.stringify([]));
         showToast('🗑️ All saved documents deleted.');
+        NeonSync.checkPendingSync();
         render();
     }
 
@@ -1236,10 +1593,17 @@
         loadSavedPDFs();
         const stats = {
             total: savedPDFs.length,
-            types: {}
+            types: {},
+            synced: 0,
+            unsynced: 0
         };
         savedPDFs.forEach(pdf => {
             stats.types[pdf.type] = (stats.types[pdf.type] || 0) + 1;
+            if (pdf._synced) {
+                stats.synced++;
+            } else {
+                stats.unsynced++;
+            }
         });
 
         let listHtml = '';
@@ -1251,10 +1615,12 @@
             </div>`;
         } else {
             listHtml = `<div class="pdf-stats">
-                <div class="stat"><span>📄</span> <span class="num">${stats.total}</span> Total Documents</div>
+                <div class="stat"><span>📄</span> <span class="num">${stats.total}</span> Total</div>
                 ${Object.entries(stats.types).map(([type, count]) => 
                     `<div class="stat"><span>${type === 'QUOTATION' ? '📄' : type === 'INVOICE' ? '📊' : type === 'RECEIPT' ? '🧾' : type === 'WORKORDER' ? '🔧' : '✅'}</span> <span class="num">${count}</span> ${type}</div>`
                 ).join('')}
+                <div class="stat"><span>☁️</span> <span class="num">${stats.synced}</span> Synced</div>
+                ${stats.unsynced > 0 ? `<div class="stat" style="background:#fef3c7;"><span>⏳</span> <span class="num">${stats.unsynced}</span> Pending</div>` : ''}
                 <button class="pdf-btn pdf-btn-delete" onclick="deleteAllPDFs()" style="margin-left:auto;">
                     🗑️ Delete All
                 </button>
@@ -1265,16 +1631,20 @@
                 const date = new Date(pdf.date);
                 const formattedDate = date.toLocaleDateString('en-KE', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
                 const typeIcon = pdf.type === 'QUOTATION' ? '📄' : pdf.type === 'INVOICE' ? '📊' : pdf.type === 'RECEIPT' ? '🧾' : pdf.type === 'WORKORDER' ? '🔧' : '✅';
+                const syncIcon = pdf._synced ? '☁️' : '💾';
+                const syncLabel = pdf._synced ? 'Synced' : 'Local';
                 
                 listHtml += `<div class="pdf-item">
                     <div class="pdf-info">
-                        <div class="pdf-name">${typeIcon} ${pdf.name}</div>
+                        <div class="pdf-name">${typeIcon} ${pdf.name} <span style="font-size:10px;color:var(--muted);">${syncIcon} ${syncLabel}</span></div>
                         <div class="pdf-meta">
                             ${pdf.customer} • ${pdf.vehicle} • ${pdf.total} • ${formattedDate}
+                            ${pdf._syncedAt ? `• Synced: ${new Date(pdf._syncedAt).toLocaleDateString()}` : ''}
                         </div>
                     </div>
                     <div class="pdf-actions">
-                        <button class="pdf-btn pdf-btn-view" onclick="viewSavedPDF('${pdf.id}')">👁️ View/Print</button>
+                        <button class="pdf-btn pdf-btn-view" onclick="viewSavedPDF('${pdf.id}')">👁️ View</button>
+                        ${!pdf._synced ? `<button class="pdf-btn pdf-btn-sync" onclick="syncSavedPDF('${pdf.id}')">☁️ Sync</button>` : ''}
                         <button class="pdf-btn pdf-btn-delete" onclick="deleteSavedPDF('${pdf.id}')">🗑️</button>
                     </div>
                 </div>`;
@@ -1295,8 +1665,14 @@
             </div>
             <div class="section-card">
                 <div class="form-body actions">
-                    <button class="btn-download full-width" onclick="exportAllPDFs()">
-                        <span class="btn-icon">📦</span> EXPORT ALL DOCUMENTS
+                    <button class="btn-sync full-width" onclick="syncAllToNeon()">
+                        <span class="btn-icon">☁️</span> SYNC ALL TO CLOUD
+                    </button>
+                    <button class="btn-save" onclick="pullFromNeon()">
+                        <span class="btn-icon">📥</span> PULL FROM CLOUD
+                    </button>
+                    <button class="btn-download" onclick="exportAllPDFs()">
+                        <span class="btn-icon">📦</span> EXPORT ALL
                     </button>
                 </div>
             </div>
@@ -1497,9 +1873,13 @@
     window.deleteAllPDFs = deleteAllPDFs;
     window.viewSavedPDF = viewSavedPDF;
     window.exportAllPDFs = exportAllPDFs;
+    window.syncSavedPDF = syncSavedPDF;
+    window.syncAllToNeon = syncAllToNeon;
+    window.pullFromNeon = pullFromNeon;
 
     // ─── INITIALIZE ──────────────────────────────────
     loadSavedPDFs();
+    NeonSync.init();
     render();
 </script>
 </body>
